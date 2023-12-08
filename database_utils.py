@@ -3,15 +3,17 @@ import yaml
 from sqlalchemy import create_engine, inspect
 import psycopg2
 
-
+filename = 'db_creds.yaml'
 
 class DatabaseConnector:
+	def __init__(self, filename):
+		# Set filname  as self varaible so work with any yaml file with the specifications set
+		self.filename = filename
 
-
-	def read_db_creds(self, filename):
+	def read_db_creds(self):
 		 # Method to read yaml file with database credential stored.
 
-		 with open(filename, 'r') as file:
+		 with open(self.filename, 'r') as file:
 			 aws_yaml = yaml.safe_load(file)
 		 return(aws_yaml)
 
@@ -46,11 +48,14 @@ class DatabaseConnector:
 		return(inspector.get_table_names())
 	
 	def upload_to_db(self, pd_df, table_name):
-
+		#TO DO:
+		# work out the same procees used to connect to server for extraction bu for 
+		# own database salses_data.
 		#Method to upload cleaned data to sql database
 		return 0
 	
-#x = DatabaseConnector().list_db_tables()
+x = DatabaseConnector(filename=filename)
+#print(x.list_db_tables())
 
 
 		

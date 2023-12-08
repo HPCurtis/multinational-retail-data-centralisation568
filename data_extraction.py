@@ -5,10 +5,12 @@ import tabula
 import requests
 import boto3
 
+filename = 'db_creds.yaml'
+
 class DataExtractor:
 	
 
-	def read_rds_table(self, table_name, dbc = DatabaseConnector()):
+	def read_rds_table(self, table_name, dbc = DatabaseConnector(filename)):
 
 		# generate sqlalechemy engine.
 		engine = dbc.init_db_engine()
@@ -30,8 +32,6 @@ class DataExtractor:
 		#Inmdecxing ight not be neccesary
 		return(response['number_stores'])
 
-		# This will show the number of stores.
-		return(response.text)
 	
 	def retrieve_stores_data(self, n_stores, store_url = 'https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/',
 						   api_key = {'x-api-key': 'yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX'}):
@@ -48,8 +48,11 @@ class DataExtractor:
 		return(df)
 	
 	def extract_from_s3(self):
+		# TO DO: Work out the aws s3 exraction of Csv
 		return(0)
+	
 
-#x = DataExtractor()
-#table_name = DatabaseConnector().list_db_tables()[1]
-#print(x.read_rds_table(table_name=table_name))
+
+
+x = DataExtractor()
+table_name = DatabaseConnector(filename).list_db_tables()[2]
