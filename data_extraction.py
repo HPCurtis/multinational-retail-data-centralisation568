@@ -4,13 +4,14 @@ import pandas as pd
 import tabula
 import requests
 import boto3
+import os
 
 filename = 'db_creds.yaml'
 
 class DataExtractor:
 	
 
-	def read_rds_table(self, table_name, dbc = DatabaseConnector(filename)):
+	def read_rds_table(self, table_name, dbc = DatabaseConnector()):
 
 		# generate sqlalechemy engine.
 		engine = dbc.init_db_engine()
@@ -47,12 +48,31 @@ class DataExtractor:
 		df = pd.concat(df_list)
 		return(df)
 	
-	def extract_from_s3(self):
-		# TO DO: Work out the aws s3 exraction of Csv
-		return(0)
+	def extract_from_s3(self, address = 's3://data-handling-public/products.csv'):
+		# Index the address
+		bucket_index_start = address.index('data-handling-public')
+		bucket_index_finish = address.index('/p')
+		file_name_index_start = bucket_index_finish + 1
+
+		# Extract bucket and file name from address
+		bucket_name = address[bucket_index_start:bucket_index_finish]
+		file_name = address[file_name_index_start:]
+		file_path ='/home/harrison/Desktop/AiCore/multinational-retail-data-centralisation568/'+file_name
+
+		# Check if file exist so call of method does not needlessly dowload the file
+		if not os.path.exists(file_path):
+			s3 = boto3.client('s3')
+			s3.download_file(bucket_name, 
+							file_name,
+							file_path)
+		
+		# Get csv into pandas dataframe to be returned below.	
+		df = pd.read_csv(file_path)
+		return(df)
+
+	def retrieve_events_data(self):
+		df = pd.read_json('https://data-handling-public.s3.eu-west-1.amazonaws.com/date_details.json')
+		
+		return(df)
 	
 
-
-
-x = DataExtractor()
-table_name = DatabaseConnector(filename).list_db_tables()[2]

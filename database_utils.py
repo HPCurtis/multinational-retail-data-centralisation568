@@ -1,19 +1,18 @@
 # #!/usr/bin/python3
 import yaml
 from sqlalchemy import create_engine, inspect
-import psycopg2
+from numpy import nan
 
-filename = 'db_creds.yaml'
 
+
+
+# Uitlitty classe -------
 class DatabaseConnector:
-	def __init__(self, filename):
-		# Set filname  as self varaible so work with any yaml file with the specifications set
-		self.filename = filename
 
 	def read_db_creds(self):
 		 # Method to read yaml file with database credential stored.
 
-		 with open(self.filename, 'r') as file:
+		 with open('db_creds.yaml', 'r') as file:
 			 aws_yaml = yaml.safe_load(file)
 		 return(aws_yaml)
 
@@ -47,15 +46,33 @@ class DatabaseConnector:
 
 		return(inspector.get_table_names())
 	
-	def upload_to_db(self, pd_df, table_name):
-		#TO DO:
-		# work out the same procees used to connect to server for extraction bu for 
-		# own database salses_data.
-		#Method to upload cleaned data to sql database
-		return 0
+	def upload_to_db(self, df, table_name, password):
+		DATABASE_TYPE = 'postgresql'
+		DBAPI = 'psycopg2'
+		HOST = 'localhost'
+		USER = 'postgres'
+		PASSWORD = password
+		DATABASE = 'sales_data'
+		PORT = 5432
+
+		engine = create_engine(f"{DATABASE_TYPE}+{DBAPI}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}")
+		engine.connect()
+		# Upload pandas dataframe to sql
+		df.to_sql(table_name, engine, if_exists='replace')
+		
+# Utility functions ------
+def edit_missing(df):
+	# Replcace any Null values with nan in the dataset
+	# then check with .info method for any missing vaaues
+	df.replace('NULL', nan, inplace = True)
+	df.replace(' ', nan, inplace = True)
+	df.replace('N/A', nan, inplace = True)
+	df.replace('None', nan, inplace = True)
+	df.info()	
+
+
+
 	
-x = DatabaseConnector(filename=filename)
-#print(x.list_db_tables())
 
 
 		
