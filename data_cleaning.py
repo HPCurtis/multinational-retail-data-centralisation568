@@ -3,38 +3,36 @@
 from database_utils import DatabaseConnector, edit_missing
 from data_extraction import DataExtractor
 from numpy import nan
+import pandas as pd
 
 filename = 'db_creds.yaml'
 
 class DataCleaning:
 
-    def df_import(self, tablename):
-        # Get dataframe using other methods
-        de = DataExtractor()
-        table_names = DatabaseConnector(filename = filename).list_db_tables()
-        user_table = table_names.index(tablename)
-
-        # Return dataframe
-        return(de.read_rds_table(table_names[user_table]))
-        
-
     def clean_user_data(self):
        # Import data 
        df = DataExtractor().read_rds_table('legacy_users')
-       
+       #df.drop(columns= 'index', inplace = True)
+       df.reset_index(drop=True)
        # Clean the data
+
+       # Get rid of redundant rows that do not contain UUID's formated values without '-' 
+       df = df[ df.user_uuid.str.contains(pat = '-')]
+       
 
        # Replcace any NUll values with nan in the dataset
        # then check with .info method for any missing vaaues
        edit_missing(df = df)
-       #TO DO add dropna method to get rid of NA's
+
+       #Remove missing values
        df.dropna(inplace = True) 
-       
+
        # Fix address'
        # Note the issue with comma on final part are untouched as no way to know 
        # what they are and maybe attempt at privacy at input
        # Fix layout with the replacment of comma
-       df.address = df.address.str.replace(',', "\\") 
+       df.address = df.address.str.replace(',', '\\') 
+      
       
        # To DO find a solution to phone number issue using pandas.    
        return(df)
@@ -47,6 +45,9 @@ class DataCleaning:
         # Deal with any missing data examples
         df = DataExtractor().retrieve_pdf_data('https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf')
         edit_missing(df = df)
+        df.dropna(inplace = True)
+
+        df = df[ df.date_payment_confirmed.str.contains(pat = '-')]
         return(df)
     
     
@@ -55,21 +56,23 @@ class DataCleaning:
         df = DataExtractor().retrieve_stores_data(n_stores = DataExtractor().list_number_of_stores())
         df.set_index('index', inplace = True)
 
+        # Get rid of non-numeric latitude values specify as null to be dealt wtih in sql 
+        # as specified by task.
+        df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
+        # Store lat values to be reinserted
+        lat_na = df['lat']
+        df.drop(columns= 'lat', inplace = True)
+
+        # Strip no numric value from staff_members.
+        df['staff_numbers'] = df['staff_numbers'].str.extract(pat='(\d+)', expand=False)
+        
+
         # Remove missing values 
         edit_missing(df = df)
-
-        # The lat columns is essential empty so drop from datafraem
-        # If that data is required it is avaible at source
-        df.drop(columns=['lat'], inplace = True)
         df.dropna(inplace = True)
-        
-        # Drop nonsense row
-        df.drop(447, inplace  = True)
 
-        return(df)
-    
-    def clean_products_data(self):
-        df = convert_product_weights() 
+        # Reinsert lat column sql task
+        df['lat'] = lat_na
         return(df)
     
     def clean_orders_data(self):
@@ -87,33 +90,71 @@ class DataCleaning:
         # return cleaned dataframe.
         return(df)
     
+    # TO DO finish this task.
     def convert_product_weights(self, df = DataExtractor().extract_from_s3()):
+        df.info()
         # Get weight into pandas series without na values
+        #df['weight'] = df['weight'].str.rstrip('kg')
         weights = df.weight 
-        # Cacualte the max string lenght for use below
-        max_string_length = weights.str.len().max()
 
-        # Calculate nubmer of Na values.
-        number_of_na = weights.isna().sum()
+        # Switch all ml to grams as one to one ratio.
+        weights = weights.str.replace('ml', 'g')
 
-        # Remove na values and non weight values and generate new dataframe.
+        #Convert the unique ounc score to kg 
+        weights = weights.str.replace('16oz', '0.45kg')
+
         weights_na = weights.dropna()
-        weights_na.drop(weights[weights.str.len() >= max_string_length].index, inplace = True)
 
         # Weight conversion.
-        
+        #Conver the srting with multplcation insidede
         x_str_mask = weights_na.str.contains('x')
+        weight_x_string = weights_na[x_str_mask].str.replace('g', '')
+        weight_x_string_split = weight_x_string.str.split(expand= True)
+        weight_x_string_split_df = pd.DataFrame(weight_x_string_split)
+        weight_x_string_split_df[0],  weight_x_string_split_df[2] = weight_x_string_split_df[0].astype('int'), weight_x_string_split_df[2].astype('int')
+        weight_x_string_split_df['weight_kg'] = (weight_x_string_split_df[0] * weight_x_string_split_df[2]) /1000
 
-        weight_x_string = weights_na[x_str_mask]
-       # weight_kg = weights[~x_str_mask]
+        # Extract gram values
+        g_str_mask = weights_na.str.contains('kg')
+        weight_g_string = weights_na[~g_str_mask]
+        weight_g_string = weight_g_string[~x_str_mask]
+        weight_g_string = weight_g_string.str.replace('g', '')
+        weight_g_string = weight_g_string.str.replace(' .', '')
 
-        return(weight_x_string)
+        # Get rid word of nosnes values
+        # Note still need to be cleaned later  
+        weight_g_string = weight_g_string.drop(weight_g_string[weight_g_string.str.len() >= 8].index )
         
+        # Convert grams to KG 
+        weight_g_string = weight_g_string.astype('float') / 1000
+        # #Convert back to string for replacment below
+        weight_g_string = weight_g_string.astype('string')
+        
+        
+        # #This works
+        df.loc[weights.index, 'weight'] = weights 
+        
+        df.loc[weight_x_string_split_df['weight_kg'].index, 'weight'] = weight_x_string_split_df['weight_kg']
+        
+        df.loc[weight_g_string.index, 'weight'] = weight_g_string
 
+        df['weight'] = df.weight.astype('string')
+        df['weight'] = df.weight.str.replace('kg', '')
     
+        df.info()
+       
+
+        return(df.weight.unique())
+    
+
     def clean_products_data(self):
         # import weight converted dataset
         df = self.convert_product_weights()
+        edit_missing(df = df)
+
+       #Remove missing values
+        #df.dropna(inplace = True) 
+        #df.info()
         
         # Further clean the data.
 
@@ -128,11 +169,13 @@ class DataCleaning:
         df.dropna(inplace = True)
 
         # Combine the day month year into datetime fore consistency
-        cols=["year","month","day"]
-        df['date'] = df[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
+        # cols=["year","month","day"]
+        # df['date'] = df[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
+
+        df = df[ df.date_uuid.str.contains(pat = '-')]
 
         # Drop useless columsn now datetime is set.
-        df.drop(columns = cols, inplace = True)
+        # df.drop(columns = cols, inplace = True)
 
 
         # Remove rows with unidentifiable key words from dataframe.
@@ -148,5 +191,5 @@ class DataCleaning:
         # CLean data
         return(df)
         
-        #return(df.time_period.unique(), )
-
+x = DataCleaning().convert_product_weights()
+print(x)

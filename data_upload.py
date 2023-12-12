@@ -5,9 +5,6 @@ pw = '13,Running1'
 
 # Upload pandas dataframes to SQL database 
 
-# Upload order table
-#table_list = DatabaseConnector().list_db_tables()
-
 # Upload the orders data.
 DatabaseConnector().upload_to_db(df = DataCleaning().clean_orders_data(), 
                                 table_name = 'orders_table', password = pw)
@@ -24,6 +21,12 @@ DatabaseConnector().upload_to_db(df = DataCleaning().clean_events_data(),
 DatabaseConnector().upload_to_db(df = DataCleaning().clean_products_data(), 
                                  table_name = 'dim_products', password = pw)
 
+# Upload store data.
 DatabaseConnector().upload_to_db(df = DataCleaning().clean_store_data(), 
                                  table_name = 'dim_store_details', password = pw)
+
+# Upload store data.
+DatabaseConnector().upload_to_db(df = DataCleaning().clean_card_data(), 
+                                 table_name = 'dim_card_details', password = pw)
+
 

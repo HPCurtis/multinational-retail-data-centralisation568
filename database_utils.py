@@ -3,10 +3,7 @@ import yaml
 from sqlalchemy import create_engine, inspect
 from numpy import nan
 
-
-
-
-# Uitlitty classe -------
+# Uitlitty class -------
 class DatabaseConnector:
 
 	def read_db_creds(self):
