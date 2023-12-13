@@ -66,10 +66,3 @@ def edit_missing(df):
 	df.replace('N/A', nan, inplace = True)
 	df.replace('None', nan, inplace = True)
 	df.info()	
-
-
-
-	
-
-
-		

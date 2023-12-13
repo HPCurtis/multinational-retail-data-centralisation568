@@ -6,6 +6,7 @@ WHERE
 	table_name = 'dim_users';
 */
 
+
 -- ALter the data type of the orders table
 ALTER TABLE orders_table
     ALTER COLUMN card_number 
@@ -116,9 +117,33 @@ ALTER TABLE dim_card_details
 	USING date_payment_confirmed::DATE;
 
 
-UPDATE dim_products
-SET product_price = replace(product_price, '£', '')
+ALTER TABLE dim_products
+	--RENAME COLUMN removed TO still_available;
+	--ALter COLUMN 
+	
+	--ALTER COLUMN still_available
+	--TYPE BOOLEAN
+	--USING still_available::boolean,
+	
+	
+	ALTER COLUMN uuid 
+	TYPE UUID
+	USING uuid::uuid,
+	
+	ALTER COLUMN weight
+	TYPE FLOAT
+	USING weight::float,
+	
+	ALTER COLUMN product_code
+	TYPE VARCHAR;
+	
+/*
+	ALTER COLUMN product_price
+	TYPE FLOAT
+	USING REPLACE(product_price, '£', '')::float;
+*/	
 
-SELECT product_price FROM dim_products
---SELECT product_price FROM dim_products;
+
+
+SELECT * FROM dim_products;
 -- SELECT * FROM dim_card_details;

@@ -9,7 +9,6 @@ FROM dim_store_details
 GROUP BY country_code
 ORDER BY COUNT(country_code) DESC;
 
-
 /* 
 Query to show the locations with the great number of stores.
 */
@@ -19,5 +18,5 @@ GROUP BY locality
 ORDER BY COUNT(locality) DESC;
 
 /*
-
+QUery the database to get the months that produced the most sales
 */

@@ -140,22 +140,21 @@ class DataCleaning:
 
         df['weight'] = df.weight.astype('string')
         df['weight'] = df.weight.str.replace('kg', '')
-    
-        df.info()
-       
 
-        return(df.weight.unique())
+        return(df)
     
 
     def clean_products_data(self):
         # import weight converted dataset
         df = self.convert_product_weights()
         edit_missing(df = df)
-
-       #Remove missing values
-        #df.dropna(inplace = True) 
-        #df.info()
         
+        #Remove missing values
+        df.dropna(inplace = True) 
+        df.info()
+        
+
+        df = df[ df.uuid.str.contains(pat = '-')]
         # Further clean the data.
 
         #Return clean dataset.
@@ -191,5 +190,5 @@ class DataCleaning:
         # CLean data
         return(df)
         
-x = DataCleaning().convert_product_weights()
-print(x)
+#x = DataCleaning().clean_products_data()
+#print(x)
