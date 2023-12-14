@@ -55,11 +55,8 @@ class DataCleaning:
         #Import store data
         df = DataExtractor().retrieve_stores_data(n_stores = DataExtractor().list_number_of_stores())
         df.set_index('index', inplace = True)
-
-        # Get rid of non-numeric latitude values specify as null to be dealt wtih in sql 
-        # as specified by task.
         
-        # Strip no numric value from staff_members.
+        # Strip non numric value from staff_members.
         df['staff_numbers'] = df['staff_numbers'].str.extract(pat='(\d+)', expand=False)
         
         # Extract only the dates

@@ -98,11 +98,14 @@ ALTER TABLE dim_store_details
 	ALTER COLUMN continent
 	TYPE VARCHAR(255);
 
+-- Make store_type NULLABLE
+ALTER TABLE dim_store_details
+	ALTER COLUMN store_type
+	DROP NOT NULL;
 
 -- Alter dim_products table
-
 ALTER TABLE dim_products
-	REMOVE £ symbol from prices.
+	--REMOVE £ symbol from prices.
 	ALTER COLUMN product_price
 	TYPE FLOAT
 	USING REPLACE(product_price, '£', '')::float;
@@ -147,8 +150,8 @@ WHERE still_available = 'Still_avaliable';
 
 
 ALTER TABLE dim_products
-	ALTER COLUMN EAN
-	TYPE VARCHAR
+	ALTER COLUMN ean
+	TYPE VARCHAR,
 	
 	ALTER COLUMN still_available
 	TYPE BOOLEAN
@@ -164,8 +167,6 @@ ALTER TABLE dim_products
 	
 	ALTER COLUMN product_code
 	TYPE VARCHAR;
-
-SELECT * FROM dim_products
 
 -- ALter dim_date_times data types.
 ALTER TABLE dim_date_times
@@ -197,5 +198,23 @@ ALTER TABLE dim_card_details
 	ALTER COLUMN date_payment_confirmed
 	TYPE DATE
 	USING date_payment_confirmed::DATE;
+
+-- Set the Priamry Key for each dim_table
+ALTER TABLE dim_card_details 
+ADD PRIMARY KEY (card_number);
+
+ALTER TABLE dim_date_times 
+ADD PRIMARY KEY (date_uuid);
+
+ALTER TABLE dim_products 
+ADD PRIMARY KEY (product_code);
+
+ALTER TABLE dim_store_details 
+ADD PRIMARY KEY (store_code);
+
+ALTER TABLE dim_users 
+ADD PRIMARY KEY (user_uuid);
+
+-- Set the foreign keys
 
 
