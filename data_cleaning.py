@@ -58,21 +58,14 @@ class DataCleaning:
 
         # Get rid of non-numeric latitude values specify as null to be dealt wtih in sql 
         # as specified by task.
-        df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
-        # Store lat values to be reinserted
-        lat_na = df['lat']
-        df.drop(columns= 'lat', inplace = True)
-
+        
         # Strip no numric value from staff_members.
         df['staff_numbers'] = df['staff_numbers'].str.extract(pat='(\d+)', expand=False)
         
-
-        # Remove missing values 
-        edit_missing(df = df)
-        df.dropna(inplace = True)
-
-        # Reinsert lat column sql task
-        df['lat'] = lat_na
+        # Extract only the dates
+        df = df[ df.opening_date.str.contains(pat = '-')]
+    
+    
         return(df)
     
     def clean_orders_data(self):
@@ -145,8 +138,10 @@ class DataCleaning:
     
 
     def clean_products_data(self):
+
         # import weight converted dataset
         df = self.convert_product_weights()
+        df.rename(columns = {'EAN': 'ean'}, inplace = True)
         edit_missing(df = df)
         
         #Remove missing values
@@ -190,5 +185,4 @@ class DataCleaning:
         # CLean data
         return(df)
         
-#x = DataCleaning().clean_products_data()
-#print(x)
+#x = DataCleaning().clean_store_data()
