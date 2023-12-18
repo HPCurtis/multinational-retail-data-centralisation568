@@ -11,3 +11,10 @@ The repository contains a series of separate python and sql scripts. The python 
 
 - database_utils.py contains as series of utility functions that are imported and used through outt the other python scripts.
 - data_extraction
+
+### License 
+Copyright [2023] [Harrison Curtis]
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
