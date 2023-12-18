@@ -117,11 +117,46 @@ SELECT ROUND( SUM(CAST(product_price AS NUMERIC) * product_quantity), 2) AS tota
 FROM GERMAN_stores
 GROUP BY store_type, country_code
 ORDER BY total_sales ASC;
+
 /*
-SELECT * FROM orders_table
-SELECT * FROM dim_card_details
-SELECT * FROM dim_date_times
-SELECT * FROM dim_products
-SELECT * FROM dim_store_details
-SELECT * FROM dim_users
+Query to get the average time between sales grouped by year
 */
+/* ALTER the table and add a timestamp column
+then update that column with timestamp.
+*/
+ALTER TABLE dim_date_times
+ADD COLUMN combined_timestamp TIMESTAMP;
+
+UPDATE dim_date_times
+SET combined_timestamp = MAKE_DATE(year::int, month::int, day::int) + timestamp::TIME;
+
+/*
+Order data into cte to then be average below
+*/
+with Date_time_ordered as
+(
+SELECT LEAD(combined_timestamp) OVER(ORDER BY year, combined_timestamp) - combined_timestamp AS lead_time,
+	   year,
+       combined_timestamp
+FROM dim_date_times
+),
+average as (
+-- Get the actual time taken grouped by year
+SELECT year,
+       AVG(lead_time) as actual_time_taken_1
+FROM 
+	Date_time_ordered
+GROUP BY year
+ORDER By actual_time_taken_1 DESC
+)
+
+SELECT year,
+    TO_JSON(
+        json_build_object(
+            'hours', (extract(epoch from actual_time_taken_1) / 3600)::int,
+            'minutes', ((extract(epoch from actual_time_taken_1) % 3600) / 60)::int,
+            'seconds', (extract(epoch from actual_time_taken_1) % 60)::int,
+            'milliseconds', (extract(milliseconds from actual_time_taken_1))::int
+        )
+    ) AS actual_time_taken
+FROM average;
