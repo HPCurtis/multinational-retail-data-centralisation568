@@ -172,11 +172,11 @@ class DataCleaning:
         # Cnvert to string.
         df['date_uuid'] = df['date_uuid'].astype('string')
         df['date_uuid'] = df['date_uuid'].str.strip()
-        print(unique(df.date_uuid == '93caf182-e4e9-4c6e-bebb-60a1a9dcf9b8'))
         
         #Deal with missing values
         # Timestamp regex
         regex_expression =  r'\d\d:\d\d:\d\d'
+
         # Values that dont follow timestamp convert to numpy nan.
         df.loc[~df['timestamp'].str.match(regex_expression), 'timestamp'] = nan
         # DRop null vales
@@ -197,10 +197,5 @@ class DataCleaning:
         return(df)
 
 
-x = DataCleaning().clean_orders_data()
-#print(unique(x.date_uuid == ('93caf182-e4e9-4c6e-bebb-60a1a9dcf9b8')))
-#y = DataCleaning().clean_events_data()
-#Current porces drops this value
-#print(sum(x['date_uuid'] == '93caf182-e4e9-4c6e-bebb-60a1a9dcf9b8'))
-#print(sum(y['date_uuid'] == '9476f17e-5d6a-4117-874d-9cdb38ca1fa6'))
+
 

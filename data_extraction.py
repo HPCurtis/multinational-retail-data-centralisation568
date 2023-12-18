@@ -12,11 +12,11 @@ class DataExtractor:
 	
 
 	def read_rds_table(self, table_name, dbc = DatabaseConnector()):
+		''' '''
 
 		# generate sqlalechemy engine.
 		engine = dbc.init_db_engine()
 
-		#with engine.execution_options(isolation_level='AUTOCOMMIT').connect() as conn:
 		table = pd.read_sql_table(table_name, engine)
 
 		# return pandas dataframe
