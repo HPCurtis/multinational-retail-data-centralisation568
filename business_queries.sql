@@ -127,7 +127,7 @@ Query to get the average time between sales grouped by year
 then update that column with timestamp.
 */
 ALTER TABLE dim_date_times
-ADD COLUMN combined_timestamp TIMESTAMP;
+ADD COLUMN IF NOT EXISTS combined_timestamp TIMESTAMP;
 
 UPDATE dim_date_times
 SET combined_timestamp = MAKE_DATE(year::int, month::int, day::int) + timestamp::TIME;
