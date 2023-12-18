@@ -2,6 +2,7 @@
 import yaml
 from sqlalchemy import create_engine, inspect
 from numpy import nan
+import pandas as pd
 
 # Uitlitty class -------
 class DatabaseConnector:
@@ -66,3 +67,16 @@ def edit_missing(df):
 	df.replace('N/A', nan, inplace = True)
 	df.replace('None', nan, inplace = True)
 	df.info()	
+	
+def unique_matching(df_order, df, col_name):
+	#Get unique values
+    df_order_u = pd.Series(df_order[col_name].unique())
+    df_u = pd.Series(df[col_name].unique())
+    #    Bollean maks of uniquw
+    res = df_order_u[~df_order_u.isin(df_u)]
+
+    df_order = df_order[df_order[col_name].isin(res.values) == False]
+    df_order_u = pd.Series(df_order[col_name].unique())
+	
+    match = df_order_u == df_u
+    return(match)

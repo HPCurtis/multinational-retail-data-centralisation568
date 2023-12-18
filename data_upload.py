@@ -1,9 +1,12 @@
+# Import reiored modules
 from database_utils import DatabaseConnector 
 from data_cleaning  import DataCleaning
 
+# SET passwrod to datasabse set up on postgres server.
 pw = '13,Running1'
 
 # Upload pandas dataframes to SQL database 
+# using DataConnector().upload_to_db() method
 
 # Upload store data.
 DatabaseConnector().upload_to_db(df = DataCleaning().clean_store_data(), 

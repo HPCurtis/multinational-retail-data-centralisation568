@@ -1,8 +1,8 @@
 #!/bin/bash
 
-from database_utils import DatabaseConnector, edit_missing
+from database_utils import DatabaseConnector, edit_missing, unique_matching
 from data_extraction import DataExtractor
-from numpy import nan
+from numpy import nan, unique
 import pandas as pd
 
 filename = 'db_creds.yaml'
@@ -44,10 +44,16 @@ class DataCleaning:
 
         # Deal with any missing data examples
         df = DataExtractor().retrieve_pdf_data('https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf')
+
         edit_missing(df = df)
         df.dropna(inplace = True)
-
-        df = df[ df.date_payment_confirmed.str.contains(pat = '-')]
+        keywords = ['NB71VBAHJE', 'WJVMUO4QX6', 'JRPRLPIBZ2',
+            'TS8A81WFXV', 'JCQMU8FN85', '5CJH7ABGDR', 'DE488ORDXY', 'OGJTXI6X1H',
+            '1M38DYQTZV', 'DLWF2HANZF', 'XGZBYBYGUW', 'UA07L7EILH', 'BU9U947ZGV',
+            '5MFWFBZRM9']
+        df = df[df.card_provider.isin(keywords) == False]
+        df['card_number'] = df['card_number'].astype('string').str.replace('?', '', regex = True)
+        #df.info()
         return(df)
     
     
@@ -55,20 +61,21 @@ class DataCleaning:
         #Import store data
         df = DataExtractor().retrieve_stores_data(n_stores = DataExtractor().list_number_of_stores())
         df.set_index('index', inplace = True)
-        
+        Keywords =  ['ZCXWWKF45G','0OLAK2I6NS', 'A3PMVM800J', 'GMMB02LA9V', '13PIY8GD1H', '36IIMAQD58', '7AHXLXIUEF']
+        df = df[df.opening_date.isin(Keywords) == False]
         # Strip non numric value from staff_members.
         df['staff_numbers'] = df['staff_numbers'].str.extract(pat='(\d+)', expand=False)
         
-        # Extract only the dates
-        df = df[ df.opening_date.str.contains(pat = '-')]
-    
-    
+        # print(df.store_code.unique())
+        #print(df.opening_date.unique())
+        #df = df[ df.opening_date.str.contains(pat = '-')]
         return(df)
     
     def clean_orders_data(self):
         # Import data fraem for cleaning.
         df = DataExtractor().read_rds_table('orders_table')
         df.set_index('index', inplace = True)
+        print(df.iloc[0])
 
         # Clean data
         # Drop the first name, last name and 1 columns from dataframe
@@ -76,9 +83,16 @@ class DataCleaning:
         
         # Check show missing values in the dataset
         edit_missing(df)
+    
 
+        # Remove any values dont date_uuid
+        #Doesnt add any null values
+        #regex_expression = r'^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$'
+        #df.loc[~df['date_uuid'].str.match(regex_expression), 'date_uuid'] = nan
+        #df.info()
         # return cleaned dataframe.
         return(df)
+
     
     # TO DO finish this task.
     def convert_product_weights(self, df = DataExtractor().extract_from_s3()):
@@ -155,19 +169,19 @@ class DataCleaning:
     def clean_events_data(self):
         # retrieve events data using DataExtractor class
         df = DataExtractor().retrieve_events_data()
+        # Cnvert to string.
+        df['date_uuid'] = df['date_uuid'].astype('string')
+        df['date_uuid'] = df['date_uuid'].str.strip()
+        print(unique(df.date_uuid == '93caf182-e4e9-4c6e-bebb-60a1a9dcf9b8'))
+        
         #Deal with missing values
+        # Timestamp regex
+        regex_expression =  r'\d\d:\d\d:\d\d'
+        # Values that dont follow timestamp convert to numpy nan.
+        df.loc[~df['timestamp'].str.match(regex_expression), 'timestamp'] = nan
+        # DRop null vales
         edit_missing(df)
         df.dropna(inplace = True)
-
-        # Combine the day month year into datetime fore consistency
-        # cols=["year","month","day"]
-        # df['date'] = df[cols].apply(lambda x: '-'.join(x.values.astype(str)), axis="columns")
-
-        df = df[ df.date_uuid.str.contains(pat = '-')]
-
-        # Drop useless columsn now datetime is set.
-        # df.drop(columns = cols, inplace = True)
-
 
         # Remove rows with unidentifiable key words from dataframe.
         includeKeywords = ['DXBU6GX1VC', 'OEOXBP8X6D',
@@ -177,9 +191,16 @@ class DataCleaning:
                             'YRYN6Y8SPJ', 'JMW951JPZC', 'DZC37NLW4F', 'SYID3PBQLP', 'IXNB2XXEKB',
                             'MZIS9E7IXD']
 
-        df_red = df[df.time_period.isin(includeKeywords) == False]
-        
+        df = df[df.time_period.isin(includeKeywords) == False]
+
         # CLean data
         return(df)
-        
-#x = DataCleaning().clean_store_data()
+
+
+x = DataCleaning().clean_orders_data()
+#print(unique(x.date_uuid == ('93caf182-e4e9-4c6e-bebb-60a1a9dcf9b8')))
+#y = DataCleaning().clean_events_data()
+#Current porces drops this value
+#print(sum(x['date_uuid'] == '93caf182-e4e9-4c6e-bebb-60a1a9dcf9b8'))
+#print(sum(y['date_uuid'] == '9476f17e-5d6a-4117-874d-9cdb38ca1fa6'))
+
