@@ -55,8 +55,10 @@ FROM online_web_sales
 GROUP BY location
 ORDER BY number_of_sales ASC;
 
-
----  TO DO: FIX the rounding issue.
+/*
+QUERY to get the total sales and their associated sale 
+percentage split by store_type 
+*/
 WITH store_sales as 
 (
 SELECT
@@ -88,7 +90,7 @@ GROUP BY dim_date_times.year, dim_date_times.month
 ORDER BY total_sales DESC;
 
 /*
-QUERY to claulate the headcount
+QUERY to calculate the headcount across counrty code
 */
 SELECT SUM(staff_numbers) as total_staff_numbers,
 	   country_code

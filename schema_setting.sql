@@ -248,14 +248,10 @@ ADD PRIMARY KEY (user_uuid);
 ALTER TABLE dim_date_times
 ADD CONSTRAINT dim_date_times_uuid_unq UNIQUE (date_uuid);
 
-/*
--- ASKS for 93caf182-e4e9-4c6e-bebb-60a1a9dcf9b8 that
-doen't  exist in either table very lost on this.
-
 ALTER TABLE orders_table
 	ADD CONSTRAINT fk_date_uuid FOREIGN KEY (date_uuid)
 	REFERENCES dim_date_times (date_uuid);
-*/
+
 
 ALTER TABLE orders_table
 	ADD CONSTRAINT fk_user_uuid FOREIGN KEY (user_uuid)
