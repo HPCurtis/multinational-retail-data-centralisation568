@@ -31,8 +31,11 @@ This repository contains a series of separate python and sql scripts. The python
 
 To make the scripts run you need two additonal yaml files. The first is databse credentials for an AWS RDS SQL database that is contained in yaml file called db_creds.yaml that  only availibbe to people with permission to have the file from AiCore company [here](https://www.theaicore.com/). The second is a user generated file called upload_db_creds.yaml that must contain password of users choosing when creating the sales_data database.
 
-The upload_db_creds.yaml file only needs it to say - PASSWORD: insert password of users choosing
+The upload_db_creds.yaml file only needs it to say 
 
+``` 
+PASSWORD: password of users choosing
+```
 ## Installation instructions 
 *Python* 
 
