@@ -21,7 +21,7 @@ ALTER TABLE orders_table
 	TYPE SMALLINT;
 
 
--- Alter the data types of the dim_users
+-- Alter the data types of the dim_users table
 ALTER TABLE dim_users
 	ALTER COLUMN first_name
 	TYPE VARCHAR(255),
@@ -45,10 +45,9 @@ ALTER TABLE dim_users
 	USING user_uuid::uuid;
 
 /*
--- Combine latitude columns columns
-to achive this new column is added
-and then cobined lat and latidue colms are Updated t
-latitude_m colmn, THEN the orignal colms re droped 
+Combine latitude columns. Yo achieve this new column
+is added and then combined lat and latituue columnsms are Updated t
+latitude_m colmn, then the original colms are droped 
 and latitude_m renamed to latitude.
 */
 
@@ -84,7 +83,8 @@ WHERE longitude = 'N/A';
 update dim_store_details
 set latitude = NULL
 WHERE latitude = 'N/A';
--- ALter the data types of the dim_store_details
+
+-- ALter the data types of the dim_store_details table
 ALTER TABLE dim_store_details
 	
 	ALTER COLUMN longitude
@@ -118,11 +118,11 @@ ALTER TABLE dim_store_details
 	ALTER COLUMN continent
 	TYPE VARCHAR(255);
 
-
 -- Make store_type NULLABLE
 ALTER TABLE dim_store_details
 	ALTER COLUMN store_type
 	DROP NOT NULL;
+
 
 -- Alter dim_products table
 ALTER TABLE dim_products
@@ -130,6 +130,9 @@ ALTER TABLE dim_products
 	ALTER COLUMN product_price
 	TYPE FLOAT
 	USING REPLACE(product_price, '£', '')::float;
+
+/*Add human readable specification to dim_products
+table*/
 
 ALTER TABLE dim_products
 	ADD COLUMN weight_class VARCHAR,
@@ -153,12 +156,14 @@ UPDATE dim_products
 set weight_class = 'Truck_Required'
 WHERE weight >= 140;
 
--- Rename columns
+-- Rename removed column
 ALTER TABLE dim_products
 	RENAME COLUMN removed TO still_available;
 
 /* 
-Convert column to allow for BOOLEAN type below
+Convert Still_availble column valies
+to allow for BOOLEAN type  conversion
+below
 */
 UPDATE dim_products
 set still_available = 0
@@ -208,7 +213,7 @@ ALTER TABLE dim_date_times
 	TYPE UUID
 	USING date_uuid::uuid;
 
--- ALter dim_datedim_card_details_times data types.	
+-- ALter dim_card_details_times data types.	
 ALTER TABLE dim_card_details
 
 	ALTER COLUMN card_number
@@ -241,12 +246,8 @@ ADD PRIMARY KEY (store_code);
 ALTER TABLE dim_users 
 ADD PRIMARY KEY (user_uuid);
 
--- Set the foreign keys Tables that are not same length cannot tak
--- FOReign KEys as the referecning much match 
--- TO DO WORK out this makes SENSE
+-- Set the foreign keys for data tables 
 
-ALTER TABLE dim_date_times
-ADD CONSTRAINT dim_date_times_uuid_unq UNIQUE (date_uuid);
 
 ALTER TABLE orders_table
 	ADD CONSTRAINT fk_date_uuid FOREIGN KEY (date_uuid)
@@ -268,4 +269,3 @@ ALTER TABLE orders_table
 ALTER TABLE orders_table
 	ADD CONSTRAINT fk_store_code FOREIGN KEY (store_code)
 	REFERENCES dim_store_details (store_code);
-

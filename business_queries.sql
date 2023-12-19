@@ -1,5 +1,5 @@
 /*
-QUERY to get countires that are operated in 
+QUERY to get countries that are operated in 
 and the number of stores in each country in
 descending order.
 */
@@ -10,16 +10,17 @@ GROUP BY country_code
 ORDER BY COUNT(country_code) DESC;
 
 /* 
-Query to show the locations with the great number of stores.
+Query to show the locations with the greatest
+number of stores in descending order.
 */
 SELECT locality, COUNT(locality)
 FROM dim_store_details
 GROUP BY locality
 ORDER BY COUNT(locality) DESC;
---Limit 7;
 
 /*
-Query the database to get the months that produced the most sales
+Query the database to get the months 
+that produced the most sales
 */
 SELECT ROUND( SUM(CAST(dim_products.product_price AS NUMERIC) * orders_table.product_quantity), 2) AS total_sales,
 	   dim_date_times.month 
@@ -31,9 +32,7 @@ ORDER BY total_sales DESC;
 
 /*
 Query the database to get the number of sales
-Happening online vs offline Calaucitng the number
-of products
-sold
+happening online vs offline.
 */
 WITH online_web_sales as
 (
@@ -78,7 +77,8 @@ FROM store_sales
 ORDER BY total_sales DESC;
 
 /*
-QUERY Which years produced the highest sales total
+QUERY which years produced the highest sales total
+in descending order.
 */
 SELECT ROUND( SUM(CAST(dim_products.product_price AS NUMERIC) * orders_table.product_quantity), 2) AS total_sales,
 	   dim_date_times.year,
@@ -90,7 +90,8 @@ GROUP BY dim_date_times.year, dim_date_times.month
 ORDER BY total_sales DESC;
 
 /*
-QUERY to calculate the headcount across counrty code
+QUERY to calculate the headcount of
+split across counrty code
 */
 SELECT SUM(staff_numbers) as total_staff_numbers,
 	   country_code
@@ -123,6 +124,7 @@ ORDER BY total_sales ASC;
 /*
 Query to get the average time between sales grouped by year
 */
+
 /* ALTER the table and add a timestamp column
 then update that column with timestamp.
 */
@@ -133,7 +135,9 @@ UPDATE dim_date_times
 SET combined_timestamp = MAKE_DATE(year::int, month::int, day::int) + timestamp::TIME;
 
 /*
-Order data into cte to then be average below
+Order data into joined cte's to be averaged below
+and presented in JSON format of hours, minutes, seconds
+and milliseconds.
 */
 with Date_time_ordered as
 (

@@ -12,20 +12,20 @@
 ## Project description
 This repository contains an illustrative example of SQL database creation and querying tailored for business purposes. The data here is hypothetical sales data from a fictional multinational corporation. The overarching objective is to guide the fictional company in becoming more informed and data-driven in its sales endeavors.
 
-The provided code revolves around the process of gathering the said sales data from the companies diverse sources, organizing this data into a SQL database (specifically using PostgreSQL), and subsequently executing a set of queries to address a series of business questions related to the sales data.
+The provided code revolves around the process of gathering the said sales data from the companies diverse sources (primairliy AWS sources), organizing this data into a SQL database (specifically using PostgreSQL), and subsequently executing a set of queries to address a series of business questions related to the sales data.
 
 ## File structure
-This repository contains a series of separate python and sql scripts. The python scripts are broken down into their respective general functionality of extracting, cleaning and uploading the data. In addition to utility functions. The sql scripts function to set the schema of the database and answer a set of busniess queries.
+This repository contains a series of separate python and sql scripts. The python scripts are broken down into their respective general functionality of extracting, cleaning and uploading the data. In addition to utility functions. The sql scripts function to set the database schema and answer a set of busniess queries.
 
 *Python*
-- database_utils.py contains a series of utility functions that are imported and used through outt the other python scripts.
-- data_extraction.py
-- data_cleaning.py
-- data_upload.py this script seperately calls the upload_db method frim database_utils module to upload each cleaned dataframe to the designated postgres database.
+- database_utils.py contains a series of utility Classes/functions that are imported and used through out the other python scripts.
+- data_extraction.py contains the DataExtractor class whci hcontains a series of methods to extarct the companies data from the various sources required.
+- data_cleaning.py contains the DataCleaning class which cleans all data extracted from the various sources.
+- data_upload.py this script seperately calls the upload_db method from database_utils class of DatabaseConnector to upload each cleaned dataframe to the designated Postgres database dsicsused in usage instructions [here](#usage-instructions).
 
 *SQL*
-- schema_setting.sql contains the sql script to set up the shema for the data base users need only run this once per data upload and then they can then use the business_queries.sql script as they please. 
-- business_queries.sql this sql script contains all the sql queries that user can use investigate and answer a series of business questions.
+- schema_setting.sql is the sql script to set up the shema for the data base users need only run this once per data upload and then they can then use the business_queries.sql script as they please. 
+- business_queries.sql this sql script contains all the sql queries that user can use to investigate and answer a series of business questions asked of the company.
 
 *Addtional*
 To make the scripts run you need two additonal yaml files. The first is databse credentials for an AWS RDS SQL database that is contained in yaml file called db_creds.yaml that  only availibbe to people with permission to have the file from AiCore company [here](https://www.theaicore.com/). The second is a user generated file called upload_db_creds.yaml that must contain password of users choosing when creating the sales_data database.
@@ -57,7 +57,7 @@ Ensure to complete the installations for both PostgreSQL and PGAdmin. These tool
 
 ## Usage instructions
 
-To use the code found in the repository users must first set up a Postgres Server and the SQL database called sales_data. This most easily achived using PGAdmin. This database must be set up so it matches these variable setting required of sqlalchemy engine creation. 
+To use the code found in the repository users must first set up a Postgres Server and the SQL database called sales_data. This most easily achieved using PGAdmin. This database must be set up so it matches these variable setting required of sqlalchemy engine creation. 
 
 ```
   HOST = 'localhost'
@@ -67,13 +67,16 @@ To use the code found in the repository users must first set up a Postgres Serve
   PORT = 5432
 ```
 
-The two passwords reuired of the scripts are found in two yaml the first files contains databse credentials for an AWS RDS SQL database that is contained in yaml file called db_creds.yaml. This file  only availibbe to people with permission to have the file from AiCore company [here](https://www.theaicore.com/). T
+The two passwords required in the scripts are found in two yaml the first of these files contains databse credentials for an AWS RDS SQL database that is contained in yaml file called db_creds.yaml. This file  only availibbe to people with permission to have the file from AiCore company [here](https://www.theaicore.com/).
 
-The second is a user generated yaml file called upload_db_creds.yaml that must contain the password of users choosing when creating the sales_data database. The upload_db_creds.yaml file only needs it to say - PASSWORD: 'password of users choosing'
+The second is a user generated yaml file that must be called upload_db_creds.yaml that must contain the password of users choosing when creating the sales_data database. The upload_db_creds.yaml file only needs it to say.
+```
+PASSWORD: 'password of users choosing'
+```
 
-With that all correct users will only need to run data_upload.py file to upload the data onto their postgres sales_data database. IF that runs fine users can simple move on to using the sql scripts. This will require users to once and only once per initialsation of sales_data to run the schema.sql file. This will set the database schema correctly.
+With that all correct users will only need to run data_upload.py file to upload the data onto their postgres sales_data database. If that runs fine users can simple move on to using the sql scripts. This will require users to once and only once per initialsation of sales_data to run the schema.sql file. This will set the database schema correctly.
 
-From here users can use the business_queries.sql file to run any of databse queries in PGadmin to query the data to answer a set of business questions outlined in the script
+From here users can use the business_queries.sql file to run any of database queries in PGadmin to query the data to answer a set of business questions outlined in the script.
 
 ## License 
 Copyright [2023] [Harrison Curtis]
