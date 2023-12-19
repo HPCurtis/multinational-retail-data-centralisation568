@@ -34,7 +34,7 @@ ORDER BY total_sales DESC;
 Query the database to get the number of sales
 happening online vs offline.
 */
-WITH online_web_sales as
+WITH online_web_sales AS
 (
 SELECT dim_store_details.store_type,
 	   orders_table.product_quantity,
@@ -42,13 +42,14 @@ SELECT dim_store_details.store_type,
 CASE 
 	WHEN dim_store_details.store_type = 'Web Portal' THEN 'Web'
 	ELSE 'Offline'
-	END AS location
+	END 
+	AS location
 FROM dim_store_details
 INNER JOIN orders_table ON dim_store_details.store_code = orders_table.store_code
 )
 
-SELECT COUNT(product_quantity) as number_of_sales,
-	   sum(product_quantity) as product_quantity_count,	
+SELECT COUNT(product_quantity) AS number_of_sales,
+	   sum(product_quantity) AS product_quantity_count,	
 	   location
 FROM online_web_sales
 GROUP BY location
@@ -72,7 +73,7 @@ GROUP BY dim_store_details.store_type
 
 SELECT store_type, 
 	   ROUND(CAST(total_sales AS NUMERIC), 2),
-       total_sales / sum(total_sales) OVER() * 100 as "percentage_total(%)"
+       total_sales / SUM(total_sales) OVER() * 100 AS "percentage_total(%)"
 FROM store_sales
 ORDER BY total_sales DESC;
 
@@ -139,7 +140,7 @@ Order data into joined cte's to be averaged below
 and presented in JSON format of hours, minutes, seconds
 and milliseconds.
 */
-with Date_time_ordered as
+WITH Date_time_ordered as
 (
 SELECT LEAD(combined_timestamp) OVER(ORDER BY year, combined_timestamp) - combined_timestamp AS lead_time,
 	   year,
@@ -155,14 +156,13 @@ FROM
 GROUP BY year
 ORDER By actual_time_taken_1 DESC
 )
-
 SELECT year,
     TO_JSON(
         json_build_object(
-            'hours', (extract(epoch from actual_time_taken_1) / 3600)::int,
-            'minutes', ((extract(epoch from actual_time_taken_1) % 3600) / 60)::int,
-            'seconds', (extract(epoch from actual_time_taken_1) % 60)::int,
-            'milliseconds', (extract(milliseconds from actual_time_taken_1))::int
+            'hours', (EXTRACT(epoch FROM actual_time_taken_1) / 3600)::int,
+            'minutes', ((EXTRACT(epoch FROM actual_time_taken_1) % 3600) / 60)::int,
+            'seconds', (EXTRACT(epoch FROM actual_time_taken_1) % 60)::int,
+            'milliseconds', (EXTRACT(milliseconds FROM actual_time_taken_1))::int
         )
     ) AS actual_time_taken
 FROM average;

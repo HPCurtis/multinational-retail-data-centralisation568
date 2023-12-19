@@ -52,13 +52,13 @@ and latitude_m renamed to latitude.
 */
 
 ALTER TABLE dim_store_details
-	ADD COLUMN Latitude_m TEXT;
+	ADD COLUMN IF NOT EXISTS Latitude_m TEXT;
 
 UPDATE dim_store_details
-set Latitude_m = CONCAT(lat, latitude);
+SET Latitude_m = CONCAT(lat, latitude);
 
-update dim_store_details
-set latitude_m = ''
+UPDATE dim_store_details
+SET latitude_m = ''
 WHERE latitude_m = 'NULLNULL';
 
 -- DROP cloumns
@@ -76,12 +76,12 @@ WHERE longitude = 'NULL';
 
 -- Convert N/A's to null so the columns can be converted
 -- in Longitude and latitude.
-update dim_store_details
-set longitude = NULL
+UPDATE dim_store_details
+SET longitude = NULL
 WHERE longitude = 'N/A';
 
-update dim_store_details
-set latitude = NULL
+UPDATE dim_store_details
+SET latitude = NULL
 WHERE latitude = 'N/A';
 
 -- ALter the data types of the dim_store_details table
@@ -123,7 +123,6 @@ ALTER TABLE dim_store_details
 	ALTER COLUMN store_type
 	DROP NOT NULL;
 
-
 -- Alter dim_products table
 ALTER TABLE dim_products
 	--REMOVE £ symbol from prices.
@@ -141,19 +140,19 @@ ALTER TABLE dim_products
 	USING weight::float;
 
 UPDATE dim_products
-set weight_class = 'light'
+SET weight_class = 'light'
 WHERE weight < 2;
 
 UPDATE dim_products
-set weight_class = 'Mid_Sized'
+SET weight_class = 'Mid_Sized'
 WHERE weight >= 2 AND weight < 40;
 
 UPDATE dim_products
-set weight_class = 'Heavy'
+SET weight_class = 'Heavy'
 WHERE weight >= 40 AND weight < 140;
 
 UPDATE dim_products
-set weight_class = 'Truck_Required'
+SET weight_class = 'Truck_Required'
 WHERE weight >= 140;
 
 -- Rename removed column
@@ -166,11 +165,11 @@ to allow for BOOLEAN type  conversion
 below
 */
 UPDATE dim_products
-set still_available = 0
+SET still_available = 0
 WHERE still_available = 'Removed';
 
 UPDATE dim_products
-set still_available = 1
+SET still_available = 1
 WHERE still_available = 'Still_avaliable';
 
 /*
@@ -247,8 +246,6 @@ ALTER TABLE dim_users
 ADD PRIMARY KEY (user_uuid);
 
 -- Set the foreign keys for data tables 
-
-
 ALTER TABLE orders_table
 	ADD CONSTRAINT fk_date_uuid FOREIGN KEY (date_uuid)
 	REFERENCES dim_date_times (date_uuid);
