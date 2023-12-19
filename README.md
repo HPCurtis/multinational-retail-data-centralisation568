@@ -75,7 +75,7 @@ The two passwords required in the scripts are found in two yaml the first of the
 
 The second is a user generated yaml file that must be called upload_db_creds.yaml that must contain the password of users choosing when creating the sales_data database. The upload_db_creds.yaml file only needs it to say.
 ```
-PASSWORD: 'password of users choosing'
+PASSWORD: password of users choosing
 ```
 
 With that all correct users will only need to run data_upload.py file to upload the data onto their postgres sales_data database. If that runs fine users can simple move on to using the sql scripts. This will require users to once and only once per initialsation of sales_data to run the schema.sql file. This will set the database schema correctly.
