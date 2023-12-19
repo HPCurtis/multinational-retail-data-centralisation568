@@ -1,9 +1,36 @@
-# Multinational-retail-data-centralisation568
+<h1> Multinational-retail-data-centralisation568</h1>
+
+<h1> Table of Contents</h1>
+
+- [Project description](#project-description)
+- [File structure](#file-structure)
+- [Installation instructions](#installation-instructions)
+- [Usage instructions](#usage-instructions)
+- [License](#license)
+
 
 ## Project description
 This repository contains an illustrative example of SQL database creation and querying tailored for business purposes. The data here is hypothetical sales data from a fictional multinational corporation. The overarching objective is to guide the fictional company in becoming more informed and data-driven in its sales endeavors.
 
 The provided code revolves around the process of gathering the said sales data from the companies diverse sources, organizing this data into a SQL database (specifically using PostgreSQL), and subsequently executing a set of queries to address a series of business questions related to the sales data.
+
+## File structure
+This repository contains a series of separate python and sql scripts. The python scripts are broken down into their respective general functionality of extracting, cleaning and uploading the data. In addition to utility functions. The sql scripts function to set the schema of the database and answer a set of busniess queries.
+
+*Python*
+- database_utils.py contains a series of utility functions that are imported and used through outt the other python scripts.
+- data_extraction.py
+- data_cleaning.py
+- data_upload.py this script seperately calls the upload_db method frim database_utils module to upload each cleaned dataframe to the designated postgres database.
+
+*SQL*
+- schema_setting.sql contains the sql script to set up the shema for the data base users need only run this once per data upload and then they can then use the business_queries.sql script as they please. 
+- business_queries.sql this sql script contains all the sql queries that user can use investigate and answer a series of business questions.
+
+*Addtional*
+To make the scripts run you need two additonal yaml files. The first is databse credentials for an AWS RDS SQL database that is contained in yaml file called db_creds.yaml that  only availibbe to people with permission to have the file from AiCore company [here](https://www.theaicore.com/). The second is a user generated file called upload_db_creds.yaml that must contain password of users choosing when creating the sales_data database.
+
+The pload_db_creds.yaml file only needs it to say - PASSWORD: insert password of users choosing
 
 ## Installation instructions 
 *Python* 
@@ -48,25 +75,7 @@ With that all correct users will only need to run data_upload.py file to upload 
 
 From here users can use the business_queries.sql file to run any of databse queries in PGadmin to query the data to answer a set of business questions outlined in the script
 
-## File structure
-This repository contains a series of separate python and sql scripts. The python scripts are broken down into their respective general functionality of extracting, cleaning and uploading the data. The sql scripts function to set the schema of the database and answer a set of busniess queries.
-
-*Python*
-- database_utils.py contains a series of utility functions that are imported and used through outt the other python scripts.
-- data_extraction.py
-- data_cleaning.py
-- data_upload.py this script seperately calls the upload_db method frim database_utils module to upload each cleaned dataframe to the designated postgres database.
-
-*SQL*
-- schema_setting.sql contains the sql script to set up the shema for the data base users need only run this once per data upload and then they can then use the business_queries.sql script as they please. 
-- business_queries.sql this sql script contains all the sql queries that user can use investigate and answer a series of business questions.
-
-*Addtional*
-To make the scirpts run you need two additonal yaml files. The first is databse credentials for an AWS RDS SQL database that is contained in yaml file called db_creds.yaml that  only availibbe to people with permission to have the file from AiCore company [here](https://www.theaicore.com/). The second is a user generated file called upload_db_creds.yaml that must contain password of users choosing when creating the sales_data database.
-
-The pload_db_creds.yaml file only needs it to say - PASSWORD: insert password of users choosing
-
-### License 
+## License 
 Copyright [2023] [Harrison Curtis]
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
